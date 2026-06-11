@@ -186,6 +186,7 @@ def main():
                 chart_item(staffs)
             case '8':
                 print("Bạn đã thoát chương trình")
+                break
             case _:
                 print("Lựa chọn không hợp lệ vui lòng nhập lại!")
                 
