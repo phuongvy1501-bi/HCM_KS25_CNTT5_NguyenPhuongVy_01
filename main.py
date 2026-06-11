@@ -1,95 +1,194 @@
-staff = [
-    {"id": "NV001", "name": "Nguyen Van A", "salary" : "400000", "working_day": "25", "allowance": "1500000", "total_income": "11500000", "income_classification": "Khá"}
+staffs = [
+    {"id":"NV001",
+    "name":"Nguyen Van A",
+    "wage":400000,
+    "day":25,
+    "allowance":1500000,
+    "total_income":11500000,
+    "income_classification":"Khá"
+    }
 ]
-def display_all(data_list):
-    if not data_list:
-        print("\n[Thông báo]: Danh sách hiện tại đang rỗng!")
-        return
-    print("\n" + "=" * 75)
-    print(f"{'ID':<10} | {'Tên đối tượng':<20} | {'Giá trị':<10} | {'Phân loại':<12} | {'Trạng thái':<15}")
-    print("-" * 75)
-    for item in data_list:
-        v_status = format_status(item.get('status'))
-        print(f"{item.get('id').upper():<10} | {item.get('name'):<20} | {item.get('value'):<10} | {item.get('rank'):<12} | {v_status:<15}")
-    print("=" * 75)
 
-def add_item(data_list):
-    print("\n--- TIẾP NHẬN ĐỐI TƯỢNG MỚI ---")
+def validate_input(prompt: str, input_type: str = "string"):
+    while True:
+        user_input = input(prompt).strip()
+        if not user_input:
+            print("Dữ liệu không được để trống! Vui lòng nhập lại.")
+            continue
+        
+        if input_type == "int":
+            try:
+                value = int(user_input)
+                if value < 0:
+                    print("Số liệu không được âm!")
+                    continue
+                return value
+            except ValueError:
+                print("Phải nhập vào một số nguyên hợp lệ!")
+                continue
+                
+        if input_type == "match":
+            try:
+                value = int(user_input)
+                if value < 0 or value > 50:
+                    print("Dữ liệu phải nằm trong khoảng từ 0 đến 50!")
+                    continue
+                return value
+            except ValueError:
+                print("Phải nhập vào một số nguyên hợp lệ!")
+                continue
+        return user_input
+
+def display_staff(data_list):
+    if not data_list:
+        print("\nDanh sách hiện tại đang rỗng!")
+        return
+    print("\n" + "=" * 137)
+    print(f"{'ID':<10} | {'Tên nhân viên':<20} | {'Lương ngày cơ bản(VND)':<25} | {'Ngày công làm việc':<20} | {'Tiền phụ cấp':<15} | {'Tổng thu nhập':<15} | {'Phân loại thu nhập':<10}")
+    print("-" * 137)
+    for item in data_list:
+        print(f"{item.get('id').upper():<10} | {item.get('name'):<20} | {item.get('wage'):<25} | {item.get('day'):<20} | {item.get('allowance'):<15} | {item.get('total_income'):<15} | {item.get('income_classification'):<10}")
+    print("=" * 137)
+    
+def add_staff(data_list):
     while True:
         search_id = validate_input("Nhập mã ID định danh: ")
         for item in data_list:
             if search_id.lower() == item.get("id").lower():
-                print("[Lỗi]: Mã ID này đã tồn tại! Vui lòng nhập lại.")
+                print("Mã ID này đã tồn tại! Vui lòng nhập lại.")
                 break
         else:
-            name = validate_input("Nhập tên đối tượng: ")
-            value = validate_input("Nhập số liệu tính toán: ", "int")
-            status = "0"
-            rank = classify_item(value)
-            
-            new_record = {
+            name = validate_input("Nhập tên nhân viên mới: ")
+            wage = validate_input("Nhập lương: ", "int")
+            day = validate_input("Nhập số ngày công: ", "int")
+            allowance = validate_input("Nhập tiền phụ cấp: ", "int")
+            total_income = (wage*day)+allowance
+            income_classification=""
+            if total_income > 30000000:
+                income_classification="Cao"
+            elif total_income>= 15000000 and total_income < 30000000:
+                income_classification="Khá"
+            elif total_income>= 9000000 and total_income < 15000000:
+                income_classification ="Trung bình"
+            else:
+                income_classification="Thấp"
+                
+            new_staff = {
                 "id": search_id,
                 "name": name,
-                "value": value,
-                "rank": rank,
-                "status": status
+                "wage": wage,
+                "day": day,
+                "allowance": allowance,
+                "total_income":total_income,
+                "income_classification":income_classification                
             }
-            data_list.append(new_record)
-            print("[Thành công]: Đã thêm đối tượng mới vào hệ thống!")
+            data_list.append(new_staff)
+            print("Đã thêm nhân viên mới vào hệ thống!")
             break
-
-def update_item(data_list):
-    print("\n--- CẬP NHẬT TRẠNG THÁI ---")
+        
+def update_staff(data_list):
     if not data_list:
-        print("[Thông báo]: Danh sách rỗng!")
+        print("Danh sách rỗng!")
         return
     search_id = validate_input("Nhập mã ID cần chỉnh sửa: ")
     for item in data_list:
         if search_id.lower() == item.get("id").lower():
-            print(f"Tìm thấy đối tượng: {item.get('name')} | Trạng thái cũ: {format_status(item.get('status'))}")
-            item["status"] = "1"
-            print("[Thành công]: Đã cập nhật trạng thái sang ĐÃ XỬ LÝ!")
+            print(f"Tìm thấy nhân viên: {item.get('name')} | Lương: {item.get('wage')}")
+            wage = validate_input("Nhập lương: ", "int")
+            day = validate_input("Nhập số ngày công: ", "int")
+            allowance = validate_input("Nhập tiền phụ cấp: ", "int")
+            total_income = (wage*day)+allowance
+            income_classification=""
+            if total_income > 30000000:
+                income_classification="Cao"
+            elif total_income>= 15000000 and total_income < 30000000:
+                income_classification="Khá"
+            elif total_income>= 9000000 and total_income < 15000000:
+                income_classification ="Trung bình"
+            else:
+                income_classification="Thấp"
+            item['wage']= wage
+            item['day']=day
+            item['allowance']=allowance
+            item['total_income']=total_income
+            item['total_income']=total_income
+            
+
+            print("Đã cập nhật trạng thái sang đã xử lý!")
             break
     else:
-        print("[Lỗi]: Không tìm thấy mã ID yêu cầu!")
-
-
-
-
-
-
-
-
-
+        print("Không tìm thấy mã ID yêu cầu!")
+def remove_item(data_list):
+    if not data_list:
+        print("[Thông báo]: Danh sách rỗng!")
+        return
+    search_id = validate_input("Nhập mã ID cần xóa: ")
+    for item in data_list:
+        if search_id.lower() == item.get("id").lower():
+            data_list.remove(item)
+            print(f"Đã xóa dữ liệu liên quan đến ID {search_id}!")
+            break
+    else:
+        print("Không tìm thấy mã ID yêu cầu để xóa!")
+    
+def search_item(data_list):
+    if not data_list:
+        print("Danh sách rỗng!")
+        return
+    keyword = validate_input("Nhập từ khóa cần tìm (Mã hoặc Tên): ")
+    results = []
+    for item in data_list:
+        if keyword.lower() == item.get("id").lower() or keyword.lower() in item.get("name").lower():
+            results.append(item)
+    if not results:
+        print("Không tìm thấy kết quả nào phù hợp!")
+    else:
+        display_all(results)
+        
+def chart_item(data_list):
+    count_a = 0
+    count_b = 0
+    count_c = 0
+    for item in data_list:
+        rank = item.get("rank")
+        if rank == "Loại A": count_a += 1
+        elif rank == "Loại B": count_b += 1
+        elif rank == "Loại C": count_c += 1
+    print(f"Số lượng thuộc Loại A: {count_a}")
+    print(f"Số lượng thuộc Loại B: {count_b}")
+    print(f"Số lượng thuộc Loại C: {count_c}")
 
 def main():
-    database = [
-        {"id": "ID01", "name": "Doi tuong Mau A", "value": 45, "rank": "Loại A", "status": "1"},
-        {"id": "ID02", "name": "Doi tuong Mau B", "value": 10, "rank": "Loại C", "status": "0"}
-    ]
     while True:
-        print("\n====== HỆ THỐNG QUẢN LÝ ======")
-        print("1. Hiển thị toàn bộ danh sách")
-        print("2. Thêm đối tượng mới")
-        print("3. Cập nhật trạng thái")
-        print("4. Xóa đối tượng")
-        print("5. Tìm kiếm (Theo ID hoặc Tên)")
-        print("6. Thống kê số lượng phân loại")
-        print("7. Thoát chương trình")
-        print("========================================")
-        choice = input("Vui lòng nhập lựa chọn của bạn: ").strip()
+        print(" DANH SÁCH CHỨC NĂNG ".center(50,"="))
+        print("1.Hiển thị danh sách nhân viên")
+        print("2.Tiếp nhận nhân viên mới")
+        print("3.Cập nhật thông tin và ngày công")
+        print("4.Xóa nhân viên")
+        print("5.Tìm kiếm nhân viên")
+        print("6.Thống kê quỹ lương và nhân sự")
+        print("7.Phân loại thu nhập tự động")
+        print("8.Thoát chương trình")
+        print("="*50)
+        choice = input("Vui lòng nhập chức năng (1-8): ")
         match choice:
-            case "1": display_all(staff)
-            case "2": add_item(staff)
-            case "3": update_item(staff)
-            case "4": remove_item(staff)
-            case "5": search_item(staff)
-            case "6": chart_item(staff)
-            case "7":
-                print("Chương trình kết thúc! Hẹn gặp lại.")
-                break
+            case '1':
+                display_staff(staffs)
+            case '2':
+                add_staff(staffs)
+            case '3':
+                update_staff(staffs)
+            case '4':
+                remove_item(staffs)
+            case '5':
+                search_item(staffs)
+            case '6':
+                chart_item(staffs)
+            case '8':
+                print("Bạn đã thoát chương trình")
             case _:
-                print("[Lỗi]: Lựa chọn không hợp lệ! Vui lòng nhập lại.")
+                print("Lựa chọn không hợp lệ vui lòng nhập lại!")
+                
 
 if __name__ == "__main__":
     main()
